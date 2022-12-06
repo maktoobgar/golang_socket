@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/maktoobgar/golang_socket/core"
 )
 
 type RoomCreate struct {
@@ -11,7 +12,7 @@ type RoomCreate struct {
 
 var addr = "127.0.0.1:8080"
 
-var rooms = map[string]*Room{}
+var rooms = map[string]*core.Room{}
 
 func main() {
 	r := gin.New()
@@ -25,25 +26,25 @@ func main() {
 		}
 
 		if room, ok := rooms[data.Name]; ok {
-			data.ConnectionsLength = len(room.clients)
+			data.ConnectionsLength = len(room.Clients)
 			ctx.JSON(200, data)
 			return
 		}
 
-		room := newRoom()
-		go room.run()
+		room := core.NewRoom()
+		go room.Run()
 		rooms[data.Name] = room
 		ctx.JSON(201, data)
 	})
 	r.GET("/room/:roomName/ws", func(ctx *gin.Context) {
 		roomName := ctx.Param("roomName")
-		var room *Room = nil
+		var room *core.Room = nil
 		var ok = false
 		if room, ok = rooms[roomName]; !ok {
 			return
 		}
 
-		connectToRoom(room, ctx.Writer, ctx.Request)
+		core.ConnectToRoom(room, ctx.Writer, ctx.Request)
 	})
 	r.Run(addr)
 }

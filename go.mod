@@ -1,4 +1,4 @@
-module example
+module github.com/maktoobgar/golang_socket
 
 go 1.19
 
