@@ -1,3 +1,15 @@
 # build
 main
 api
+
+# env for python
+env
+
+# python weird folder
+__pycache__
+
+# config files
+.env
+env.yml
+env.yaml
+env.json
