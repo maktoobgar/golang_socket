@@ -45,7 +45,9 @@ type Client struct {
 	conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
+	send chan *Message
+
+	terminateWriter chan bool
 }
 
 // readPump pumps messages from the websocket connection to the room.
@@ -64,13 +66,10 @@ func (c *Client) readPump() {
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
-			break
+			return
 		}
 		message = bytes.TrimSpace(bytes.ReplaceAll(message, newline, space))
-		c.room.broadcast <- message
+		c.room.broadcast <- &Message{Message: message, From: c}
 	}
 }
 
@@ -99,14 +98,8 @@ func (c *Client) writePump() {
 			if err != nil {
 				return
 			}
-			w.Write(message)
-
-			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
+			w.Write(message.Message)
+			w.Write(newline)
 
 			if err := w.Close(); err != nil {
 				return
@@ -116,6 +109,8 @@ func (c *Client) writePump() {
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
+		case <-c.terminateWriter:
+			return
 		}
 	}
 }
@@ -127,7 +122,7 @@ func ConnectToRoom(room *Room, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{room: room, conn: conn, send: make(chan []byte, 256)}
+	client := &Client{room: room, conn: conn, send: make(chan *Message), terminateWriter: make(chan bool)}
 	client.room.register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in

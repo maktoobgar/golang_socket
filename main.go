@@ -15,8 +15,20 @@ var addr = "127.0.0.1:8080"
 var rooms = map[string]*core.Room{}
 
 func main() {
-	r := gin.New()
-	r.POST("/room", func(ctx *gin.Context) {
+	r := gin.Default()
+	r.GET("/rooms", func(ctx *gin.Context) {
+		keys := make([]RoomCreate, len(rooms))
+
+		i := 0
+		for k, v := range rooms {
+			keys[i].Name = k
+			keys[i].ConnectionsLength = len(v.Clients)
+			i++
+		}
+
+		ctx.JSON(200, keys)
+	})
+	r.POST("/rooms", func(ctx *gin.Context) {
 		data := &RoomCreate{}
 		if err := ctx.BindJSON(data); err != nil {
 			ctx.JSON(400, gin.H{
@@ -36,11 +48,29 @@ func main() {
 		rooms[data.Name] = room
 		ctx.JSON(201, data)
 	})
-	r.GET("/room/:roomName/ws", func(ctx *gin.Context) {
-		roomName := ctx.Param("roomName")
-		var room *core.Room = nil
-		var ok = false
+	r.DELETE("/rooms/:roomName", func(ctx *gin.Context) {
+		var (
+			roomName            = ctx.Param("roomName")
+			room     *core.Room = nil
+			ok                  = false
+		)
 		if room, ok = rooms[roomName]; !ok {
+			ctx.Status(400)
+			return
+		}
+
+		//! delete(rooms, roomName)
+		room.Terminate()
+		ctx.Status(204)
+	})
+	r.GET("/rooms/:roomName/ws", func(ctx *gin.Context) {
+		var (
+			roomName            = ctx.Param("roomName")
+			room     *core.Room = nil
+			ok                  = false
+		)
+		if room, ok = rooms[roomName]; !ok {
+			ctx.Status(400)
 			return
 		}
 
