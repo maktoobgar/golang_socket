@@ -15,7 +15,7 @@ go mod download
 go run main.go
 ```
 
-## Technical Stand Point
+## Technical Details
 
 This project is a combination of [gorrila websocket] and [gin framework] all combined together.
 Most base codes come from a [example chat] app code from [gorrila websocket] project which I just developed a little more and combined it with [gin framework].
