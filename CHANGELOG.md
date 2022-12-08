@@ -25,7 +25,7 @@
 <!-- Versions -->
 [v0.0.1]: https://github.com/maktoobgar/golang_socket/releases/tag/v0.0.1
 [v0.0.0]: https://github.com/maktoobgar/golang_socket/releases/tag/v0.0.0
-[unreleased]: https://github.com/maktoobgar/golang_socket/compare/v0.0.0...HEAD
+[unreleased]: https://github.com/maktoobgar/golang_socket/compare/v0.0.1...HEAD
 <!-- ## [0.0.2] - 2022-12-07
 
 ### Added
