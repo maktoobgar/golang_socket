@@ -7,14 +7,16 @@ import (
 )
 
 func List(ctx *gin.Context) {
-	keys := make([]dto.Room, len(chat.Rooms))
+	output := make([]dto.Room, 0, len(chat.Rooms))
 
-	i := 0
-	for k, v := range chat.Rooms {
-		keys[i].Name = k
-		keys[i].ConnectionsLength = len(v.Clients)
-		i++
+	for _, v := range chat.Rooms {
+		element := dto.Room{
+			ID:                v.ID,
+			Name:              v.Name,
+			ConnectionsLength: len(v.Clients),
+		}
+		output = append(output, element)
 	}
 
-	ctx.JSON(200, keys)
+	ctx.JSON(200, output)
 }

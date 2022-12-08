@@ -16,6 +16,12 @@ var Rooms = map[string]*Room{}
 // Room maintains the set of active clients and broadcasts messages to the
 // clients.
 type Room struct {
+	// Unique key for every room
+	ID int
+
+	// Assigned name for room
+	Name string
+
 	// Registered clients.
 	Clients map[*Client]bool
 
@@ -35,8 +41,10 @@ type Room struct {
 	clientsKey *sync.Mutex
 }
 
-func NewRoom() *Room {
+func NewRoom(name string, id int) *Room {
 	return &Room{
+		ID:         id,
+		Name:       name,
 		Clients:    make(map[*Client]bool),
 		broadcast:  make(chan *Message),
 		register:   make(chan *Client),
