@@ -3,6 +3,8 @@
 // license that can be found in the LICENSE file.
 package core
 
+import "sync"
+
 type Message struct {
 	Message []byte
 
@@ -26,6 +28,9 @@ type Room struct {
 
 	// Terminate room
 	terminate chan bool
+
+	// Key to lock when editing clients and broadcasting message
+	clientsKey *sync.Mutex
 }
 
 func NewRoom() *Room {
@@ -35,6 +40,7 @@ func NewRoom() *Room {
 		unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
 		terminate:  make(chan bool),
+		clientsKey: &sync.Mutex{},
 	}
 }
 
@@ -42,30 +48,35 @@ func (h *Room) Run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.Clients[client] = true
+			h.wrapByLockUnlock(func() { h.Clients[client] = true })
 		case client := <-h.unregister:
-			if _, ok := h.Clients[client]; ok {
-				delete(h.Clients, client)
-				close(client.send)
-			}
+			h.wrapByLockUnlock(func() { delete(h.Clients, client) })
 		case message := <-h.broadcast:
-			for client := range h.Clients {
-				select {
-				case client.send <- message:
-				default:
-					close(client.send)
-					delete(h.Clients, client)
+			h.wrapByLockUnlock(func() {
+				for client := range h.Clients {
+					select {
+					case client.send <- message:
+					default:
+						delete(h.Clients, client)
+					}
 				}
-			}
+			})
 		case <-h.terminate:
-			for client := range h.Clients {
-				client.conn.Close()
-				client.terminateWriter <- true
-			}
-			h.Clients = map[*Client]bool{}
+			h.wrapByLockUnlock(func() {
+				for client := range h.Clients {
+					client.Terminate()
+				}
+				h.Clients = map[*Client]bool{}
+			})
 			return
 		}
 	}
+}
+
+func (h *Room) wrapByLockUnlock(function func()) {
+	h.clientsKey.Lock()
+	function()
+	h.clientsKey.Unlock()
 }
 
 func (h *Room) Terminate() {

@@ -47,7 +47,15 @@ type Client struct {
 	// Buffered channel of outbound messages.
 	send chan *Message
 
+	// Terminate writer
 	terminateWriter chan bool
+
+	// Determines if client is all off or not
+	fullyTurnedOff bool
+}
+
+func newClient(room *Room, conn *websocket.Conn) *Client {
+	return &Client{room: room, conn: conn, send: make(chan *Message), terminateWriter: make(chan bool), fullyTurnedOff: false}
 }
 
 // readPump pumps messages from the websocket connection to the room.
@@ -57,8 +65,9 @@ type Client struct {
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
-		c.room.unregister <- c
-		c.conn.Close()
+		if !c.fullyTurnedOff {
+			c.TerminateAndUnregister()
+		}
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -82,7 +91,9 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.conn.Close()
+		if !c.fullyTurnedOff {
+			c.TerminateAndUnregister()
+		}
 	}()
 	for {
 		select {
@@ -115,6 +126,21 @@ func (c *Client) writePump() {
 	}
 }
 
+func (c *Client) TerminateAndUnregister() {
+	c.fullyTurnedOff = true
+	c.terminateWriter <- true
+	c.conn.Close()
+	c.room.unregister <- c
+	c.room = nil
+}
+
+func (c *Client) Terminate() {
+	c.fullyTurnedOff = true
+	c.terminateWriter <- true
+	c.conn.Close()
+	c.room = nil
+}
+
 // ConnectToRoom handles websocket requests from the peer.
 func ConnectToRoom(room *Room, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -122,7 +148,7 @@ func ConnectToRoom(room *Room, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{room: room, conn: conn, send: make(chan *Message), terminateWriter: make(chan bool)}
+	client := newClient(room, conn)
 	client.room.register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in
