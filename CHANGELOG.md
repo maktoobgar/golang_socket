@@ -2,13 +2,16 @@
 
 ## [Unreleased]
 
-- 🐛 fix: sync.Mutex added to prevent unwanted behaviors
 
 ## [v0.0.1] - 2022-12-08
 
 ### Fixed
 
 - delete mechanism now works properly
+
+### Security
+
+- sync.Mutex added to prevent unwanted behaviors
 
 ## [v0.0.0] - 2022-12-08
 

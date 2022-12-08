@@ -35,10 +35,10 @@ type Room struct {
 
 func NewRoom() *Room {
 	return &Room{
+		Clients:    make(map[*Client]bool),
 		broadcast:  make(chan *Message),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		Clients:    make(map[*Client]bool),
 		terminate:  make(chan bool),
 		clientsKey: &sync.Mutex{},
 	}
