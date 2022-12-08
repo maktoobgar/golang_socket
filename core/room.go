@@ -62,7 +62,7 @@ func (h *Room) Run() {
 				client.conn.Close()
 				client.terminateWriter <- true
 			}
-			h.Clients = nil
+			h.Clients = map[*Client]bool{}
 			return
 		}
 	}

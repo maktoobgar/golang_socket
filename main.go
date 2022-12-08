@@ -59,7 +59,7 @@ func main() {
 			return
 		}
 
-		//! delete(rooms, roomName)
+		delete(rooms, roomName)
 		room.Terminate()
 		ctx.Status(204)
 	})

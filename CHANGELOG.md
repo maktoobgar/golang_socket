@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 
+## [v0.0.1] - 2022-12-08
+
+### Fixed
+
+- delete mechanism now works properly
+
 ## [v0.0.0] - 2022-12-08
 
 ### Added
@@ -13,6 +19,7 @@
 - rooms list
 
 <!-- Versions -->
+[v0.0.1]: https://github.com/maktoobgar/golang_socket/releases/tag/v0.0.1
 [v0.0.0]: https://github.com/maktoobgar/golang_socket/releases/tag/v0.0.0
 [unreleased]: https://github.com/maktoobgar/golang_socket/compare/v0.0.0...HEAD
 <!-- ## [0.0.2] - 2022-12-07
