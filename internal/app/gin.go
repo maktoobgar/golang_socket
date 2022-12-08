@@ -9,6 +9,9 @@ import (
 )
 
 func Gin() {
+	if !configs.CFG.Debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.Default()
 
 	routers.ApplyAllRouters(r)

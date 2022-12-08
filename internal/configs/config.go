@@ -16,8 +16,8 @@ var (
 type Config struct {
 	Host         string   `yaml:"host"`
 	Port         int      `yaml:"port"`
-	AllowOrigins []string `yaml:"allow_origins"`
 	Debug        bool     `yaml:"debug"`
+	AllowOrigins []string `yaml:"allow_origins"`
 }
 
 func init() {
