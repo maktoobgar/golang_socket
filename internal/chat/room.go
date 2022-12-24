@@ -3,7 +3,10 @@
 // license that can be found in the LICENSE file.
 package chat
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 type Message struct {
 	Message []byte
@@ -63,6 +66,7 @@ func (h *Room) Run() {
 			h.wrapByLockUnlock(func() { delete(h.Clients, client) })
 		case message := <-h.broadcast:
 			h.wrapByLockUnlock(func() {
+				message.Message = []byte(fmt.Sprintf("%s:%s", message.From.name, message.Message))
 				for client := range h.Clients {
 					select {
 					case client.send <- message:

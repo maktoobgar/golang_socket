@@ -52,10 +52,13 @@ type Client struct {
 
 	// Determines if client is all off or not
 	fullyTurnedOff bool
+
+	// Name of client
+	name string
 }
 
-func newClient(room *Room, conn *websocket.Conn) *Client {
-	return &Client{room: room, conn: conn, send: make(chan *Message), terminateWriter: make(chan bool), fullyTurnedOff: false}
+func newClient(room *Room, conn *websocket.Conn, name string) *Client {
+	return &Client{room: room, conn: conn, send: make(chan *Message), terminateWriter: make(chan bool), fullyTurnedOff: false, name: name}
 }
 
 // readPump pumps messages from the websocket connection to the room.
@@ -142,14 +145,14 @@ func (c *Client) Terminate() {
 }
 
 // ConnectToRoom handles websocket requests from the peer.
-func ConnectToRoom(room *Room, w http.ResponseWriter, r *http.Request) {
+func ConnectToRoom(room *Room, w http.ResponseWriter, r *http.Request, name string) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := newClient(room, conn)
-	client.room.register <- client
+	client := newClient(room, conn, name)
+	room.register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.

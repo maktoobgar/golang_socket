@@ -8,6 +8,7 @@ import (
 func JoinRooms(ctx *gin.Context) {
 	var (
 		roomName            = ctx.Param("roomName")
+		name                = ctx.Param("name")
 		room     *chat.Room = nil
 		ok                  = false
 	)
@@ -16,5 +17,5 @@ func JoinRooms(ctx *gin.Context) {
 		return
 	}
 
-	chat.ConnectToRoom(room, ctx.Writer, ctx.Request)
+	chat.ConnectToRoom(room, ctx.Writer, ctx.Request, name)
 }

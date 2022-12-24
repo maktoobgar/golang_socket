@@ -6,5 +6,5 @@ import (
 )
 
 func joinRooms(r *gin.Engine) {
-	r.GET("/rooms/:roomName/ws", ws.JoinRooms)
+	r.GET("/rooms/:roomName/name/:name/ws", ws.JoinRooms)
 }
