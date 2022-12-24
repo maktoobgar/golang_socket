@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- 🎉 feat: added a piecce of code to remove all rooms after one hour
 - 🎉 feat: added feature to send people name
 
 ## [v0.0.1] - 2022-12-08

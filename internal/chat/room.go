@@ -6,7 +6,24 @@ package chat
 import (
 	"fmt"
 	"sync"
+	"time"
 )
+
+// Cleans rooms every 1 hour
+func init() {
+	ticker := time.NewTicker(time.Hour)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				for key := range Rooms {
+					Rooms[key].terminate <- true
+				}
+				Rooms = map[string]*Room{}
+			}
+		}
+	}()
+}
 
 type Message struct {
 	Message []byte
