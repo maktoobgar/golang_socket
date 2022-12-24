@@ -2,8 +2,13 @@
 
 ## [Unreleased]
 
-- 🎉 feat: added a piecce of code to remove all rooms after one hour
-- 🎉 feat: added feature to send people name
+
+## [v1.0.0] - 2022-12-24
+
+### Added
+
+- added a piecce of code to remove all rooms after one hour
+- added feature to send people name with message
 
 ## [v0.0.1] - 2022-12-08
 
@@ -25,9 +30,10 @@
 - rooms list
 
 <!-- Versions -->
+[v1.0.0]: https://github.com/maktoobgar/golang_socket/releases/tag/v1.0.0
 [v0.0.1]: https://github.com/maktoobgar/golang_socket/releases/tag/v0.0.1
 [v0.0.0]: https://github.com/maktoobgar/golang_socket/releases/tag/v0.0.0
-[unreleased]: https://github.com/maktoobgar/golang_socket/compare/v0.0.1...HEAD
+[unreleased]: https://github.com/maktoobgar/golang_socket/compare/v1.0.0...HEAD
 <!-- ## [0.0.2] - 2022-12-07
 
 ### Added
