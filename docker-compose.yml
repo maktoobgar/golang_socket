@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  backend:
+    container_name: task_manager_backend
+    build:
+      context: .
+      dockerfile: ./dockerfile
+    restart: always
+    ports:
+      - 3006:5000
